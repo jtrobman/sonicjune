@@ -21,7 +21,11 @@ export class AuthService {
 
   constructor() {
     if (!environment.supabaseUrl || !environment.supabaseKey) {
-      throw new Error('Supabase configuration is missing');
+      console.error('Missing Supabase configuration:', {
+        url: environment.supabaseUrl ? 'present' : 'missing',
+        key: environment.supabaseKey ? 'present' : 'missing'
+      });
+      throw new Error('Supabase configuration is missing. Please check your environment variables.');
     }
 
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
@@ -36,7 +40,7 @@ export class AuthService {
     this.supabase.auth.getSession().then(({ data: { session } }) => {
       this.userSubject.next(session?.user ?? null);
     });
-    
+
     // Listen for auth changes
     this.supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -76,7 +80,7 @@ export class AuthService {
       const { error: profileError } = await this.supabase
         .from('profiles')
         .insert([{ id: data.user.id, email }]);
-      
+
       if (profileError) throw profileError;
     }
 
@@ -94,7 +98,7 @@ export class AuthService {
       .select('*')
       .eq('id', userId)
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -171,13 +175,13 @@ export class AuthService {
     try {
       const user = await this.getCurrentUser();
       if (!user) return false;
-      
+
       const { data, error } = await this.supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
-      
+
       if (error) return false;
       return data?.role === 'admin';
     } catch {

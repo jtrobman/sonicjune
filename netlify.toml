@@ -1,7 +1,7 @@
 [build]
-  base = ""
   command = "npm run build"
   publish = "dist/demo"
+  environment = { NODE_VERSION = "20" }
 
 [[plugins]]
 package = "@netlify/angular-runtime"

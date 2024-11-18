@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Load environment variables from .env file
-const env = dotenv.config().parsed;
+// Load environment variables from .env file and process.env
+const env = {
+  ...dotenv.config().parsed,
+  ...process.env
+};
 
 // Create environment.ts file
 const environmentFileContent = `export const environment = {
@@ -24,7 +27,7 @@ const environmentProdFileContent = `export const environment = {
 // Ensure environments directory exists
 const envDir = path.join(__dirname, '../src/environments');
 if (!fs.existsSync(envDir)) {
-  fs.mkdirSync(envDir);
+  fs.mkdirSync(envDir, { recursive: true });
 }
 
 // Write the files
